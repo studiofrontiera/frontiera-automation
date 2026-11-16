@@ -1,7 +1,7 @@
 import Link from "next/link";
-import type { Lang } from "@/lib/demo";
+import type { Lang } from "@/lib/playground/types";
 import { COPY, FORM_ACTION, STACK, WHATSAPP } from "@/lib/copy";
-import { Demo } from "./Demo";
+import { Playground } from "./Playground";
 import { Calculator } from "./Calculator";
 
 export function Home({ lang }: { lang: Lang }) {
@@ -20,7 +20,7 @@ export function Home({ lang }: { lang: Lang }) {
             <span className="brand-tag mono">{c.tag}</span>
           </Link>
           <nav className="nav">
-            <a href="#demo">{c.nav.demo}</a>
+            <a href="#playground">{c.nav.demo}</a>
             <a href="#servicios">{c.nav.services}</a>
             <a href="#proceso">{c.nav.process}</a>
           </nav>
@@ -45,7 +45,7 @@ export function Home({ lang }: { lang: Lang }) {
               </h1>
               <p className="lead">{c.hero.lead}</p>
               <div className="cta-row">
-                <a className="btn" href="#demo">{c.hero.cta} <span aria-hidden="true">→</span></a>
+                <a className="btn" href="#playground">{c.hero.cta} <span aria-hidden="true">→</span></a>
                 <a className="link" href="#contacto">{c.hero.cta2}</a>
               </div>
             </div>
@@ -62,12 +62,12 @@ export function Home({ lang }: { lang: Lang }) {
           </div>
         </section>
 
-        <section className="sec" id="demo">
+        <section className="sec" id="playground">
           <div className="wrap">
-            <p className="label mono">{"// "}{c.demo.label}</p>
-            <h2>{c.demo.title}</h2>
-            <p className="sub">{c.demo.lead}</p>
-            <Demo lang={lang} c={c.demo} />
+            <p className="label mono">{"// "}{c.play.label}</p>
+            <h2>{c.play.title}</h2>
+            <p className="sub">{c.play.lead}</p>
+            <Playground lang={lang} c={c.play} />
           </div>
         </section>
 

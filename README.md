@@ -2,18 +2,35 @@
 
 Source of [frontiera.cl](https://www.frontiera.cl): a minimal, bilingual (ES/EN) website for an AI automation and integrations studio in Santiago, Chile.
 
-The site is also a working sample of the kind of systems it sells: the home page runs a live AI workflow step that visitors can try.
+The site is also a working sample of the kind of systems it sells: the home page has a **workflow playground** where visitors run real automations in the browser and inspect every step.
 
-## What is inside
+## The playground
+
+Three small workflows, each built as `trigger → AI step → rule → action`:
+
+| Scenario | AI extracts | The rule decides (in code, not by the model) | Action payload |
+|---|---|---|---|
+| Inbound lead | contact, intent, urgency, tasks, draft reply | notify sales now or queue | CRM contact + deal |
+| Supplier invoice | supplier, tax ID, number, dates, amounts, items | net + tax = total, items add up, approval above a limit | ledger row + approval request |
+| Support ticket | customer, order, category, priority, sentiment, reply | team, SLA hours, escalation | help desk ticket |
+
+Visitors can edit the input, run it, click any node to see its data as a readable view or raw JSON, and share a deep link (`/?s=invoice#playground`).
+
+### How the AI is kept honest
+
+- **Strict schema**: the OpenAI Responses API is called with each scenario's JSON schema in strict mode, and the answer is validated again on the server (`lib/playground/validate.ts`).
+- **Grounding**: e-mails, phones, tax IDs, invoice numbers and amounts survive only if they literally appear in the input. Anything invented becomes `null`.
+- **Decisions in code**: approvals, routing and SLAs are deterministic functions with unit tests. The model never decides them.
+- **Graceful fallback**: without an API key, or if the call fails, a rule-based extractor returns the same shape and the UI labels the mode.
+- **Privacy**: requests use `store: false`, nothing is persisted or logged, per-IP rate limit.
+
+## Other parts
 
 | Part | What it does |
 |---|---|
-| Live AI demo (`app/api/demo`) | Turns an inbound customer e-mail into a structured CRM record, follow-up tasks and a draft reply, using the OpenAI Responses API with a strict JSON schema |
-| Guardrails (`lib/demo.ts`) | Contact data is accepted only if it literally appears in the message, enums are validated, output is length-bounded, per-IP rate limit, nothing is stored |
-| Rule-based fallback | If the AI call is not configured or fails, a deterministic extractor returns the same shape, and the UI labels the mode honestly |
 | Savings calculator | Client-side estimate of hours and cost spent on repetitive work |
 | Legacy redirects (`next.config.ts`) | Permanent redirects from the previous site's URLs, so old links never 404 |
-| Tests (`lib/demo.test.ts`) | Node test runner covering extraction, intent and the sanitizer |
+| CI (`.github/workflows/ci.yml`) | Typecheck, lint, tests and build on every push |
 
 ## Stack
 
@@ -33,14 +50,15 @@ npm run typecheck
 npm run build
 ```
 
-Without `OPENAI_API_KEY` the demo runs in rule-based mode.
+Without `OPENAI_API_KEY` the playground runs in rule-based mode.
 
 ## Project structure
 
 ```
-app/            routes: /, /en, /privacidad, /en/privacy, /api/demo, sitemap, robots
-components/     Home, Demo (client), Calculator (client), Privacy
-lib/            copy (ES/EN text), demo logic and schema, metadata helpers
+app/            routes: /, /en, /privacidad, /en/privacy, /api/playground, sitemap, robots
+components/     Home, Playground (client), JsonView, Calculator (client), Privacy
+lib/            copy (ES/EN text), metadata helpers
+lib/playground/ scenarios, validation and grounding, AI step, tests
 ```
 
 ## Notes

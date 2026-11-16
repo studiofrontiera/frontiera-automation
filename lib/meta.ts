@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import type { Lang } from "./demo";
+import type { Lang } from "./playground/types";
 import { COPY } from "./copy";
 
 export function homeMeta(lang: Lang): Metadata {

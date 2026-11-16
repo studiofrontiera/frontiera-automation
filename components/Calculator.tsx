@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Lang } from "@/lib/demo";
+import type { Lang } from "@/lib/playground/types";
 import type { Copy } from "@/lib/copy";
 
 const WEEKS_PER_MONTH = 4.33;
