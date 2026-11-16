@@ -39,8 +39,10 @@ async function respond(system: string, user: Content[], opts: { schema?: ObjectS
       console.error("playground_ai_error", res.status, err?.error?.code ?? err?.error?.type ?? "unknown", err?.error?.param ?? "");
       return null;
     }
-    const body = (await res.json()) as ResponsesBody;
-    return body.output_text ?? body.output?.flatMap((o) => o.content ?? []).find((c) => c.type === "output_text")?.text ?? null;
+    const body = (await res.json()) as ResponsesBody & { status?: string; incomplete_details?: { reason?: string } };
+    const out = body.output_text ?? body.output?.flatMap((o) => o.content ?? []).find((c) => c.type === "output_text")?.text ?? null;
+    if (!out) console.error("playground_ai_empty", body.status ?? "", body.incomplete_details?.reason ?? "");
+    return out;
   } catch (e) {
     console.error("playground_ai_error", "exception", e instanceof Error ? e.name : "unknown");
     return null;
