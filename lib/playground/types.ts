@@ -45,11 +45,34 @@ export type Decision = {
   checks: { label: string; ok: boolean }[];
 };
 
+/** A rule parameter the visitor can tune with a slider; the decision is recomputed in the browser. */
+export type Setting = {
+  key: string;
+  label: Bi;
+  min: number;
+  max: number;
+  step: number;
+  default: number;
+  unit: string;
+};
+
+export type Settings = Record<string, number>;
+
 export type Scenario<T extends JsonObject = JsonObject> = {
   id: string;
   label: Bi;
   blurb: Bi;
   sample: Bi;
+  /** A hard case (bad data, missing fields) that shows how the rules catch problems. */
+  edge: Bi;
+  edgeNote: Bi;
+  /** Rough minutes a person spends on one item by hand, and a typical monthly volume (both estimates). */
+  manualMinutes: number;
+  monthlyVolume: number;
+  volumeUnit: Bi;
+  settings: Setting[];
+  /** Accepts a PDF or image instead of text (the AI step reads the document first). */
+  acceptsFiles?: boolean;
   nodes: { kind: NodeKind; title: Bi; tool: string }[];
   schema: ObjectSchema;
   /** Fields that must literally appear in the input text, so the model cannot invent them. */
@@ -57,13 +80,17 @@ export type Scenario<T extends JsonObject = JsonObject> = {
   prompt: Bi;
   fields: FieldView[];
   fallback: (input: string, lang: Lang) => T;
-  decide: (data: T, lang: Lang) => Decision;
-  payload: (data: T, decision: Decision) => JsonObject;
+  decide: (data: T, lang: Lang, settings: Settings) => Decision;
+  payload: (data: T, decision: Decision, settings: Settings) => JsonObject;
+  /** JavaScript for the rule node of the exported n8n workflow; `data` holds the extracted fields. */
+  n8nRule: (settings: Settings) => string;
 };
 
 export type RunResult = {
   scenario: string;
   mode: "ai" | "rules";
+  /** Text the decision was grounded on: the input, or what the AI read from an uploaded document. */
+  source: string;
   ms: number;
   trigger: JsonObject;
   extracted: JsonObject;

@@ -1,4 +1,4 @@
-import type { Lang, Scenario } from "../types.ts";
+import type { JsonObject, Lang, Scenario } from "../types.ts";
 
 type Lead = {
   name: string | null;
@@ -35,6 +35,21 @@ export const lead: Scenario<Lead> = {
     es: "Hola, soy Carla Rojas de la empresa Ferretería Sur. Necesitamos cotizar con urgencia una automatización para la facturación: hoy pasamos a mano las órdenes de compra a Excel y luego al sistema contable. ¿Pueden llamarme mañana? Mi teléfono es +56 9 1234 5678 y mi correo carla@ferreteriasur.example.\n\nSaludos,\nCarla",
     en: "Hi, my name is Daniel Hayes from Northwind Supplies. We urgently need a quote to automate our invoicing: today we copy purchase orders into Excel by hand and then into our accounting system. Could you call me tomorrow? My phone is +1 415 555 0142 and my e-mail is daniel@northwind.example.\n\nThanks,\nDaniel",
   },
+  edge: {
+    es: "hola!! necesito precio YA para automatizar las cotizaciones, es para hoy. me pueden escribir? gracias",
+    en: "hi!! need a price NOW to automate our quotes, it's for today. can you write me? thanks",
+  },
+  edgeNote: {
+    es: "Mensaje urgente pero sin nombre, correo ni teléfono. La IA no puede inventarlos y la regla no crea un contacto vacío: lo retiene y pide los datos.",
+    en: "Urgent, but no name, e-mail or phone. The AI cannot invent them and the rule will not create an empty contact: it holds it and asks for details.",
+  },
+  manualMinutes: 5,
+  monthlyVolume: 200,
+  volumeUnit: { es: "correos al mes", en: "e-mails a month" },
+  settings: [
+    { key: "hotMinutes", label: { es: "Responder leads urgentes en", en: "Reply to urgent leads within" }, min: 5, max: 120, step: 5, default: 15, unit: "min" },
+    { key: "queueHours", label: { es: "Responder el resto en", en: "Reply to the rest within" }, min: 1, max: 48, step: 1, default: 24, unit: "h" },
+  ],
   nodes: [
     { kind: "trigger", title: { es: "Correo recibido", en: "E-mail received" }, tool: "Gmail" },
     { kind: "ai", title: { es: "IA extrae y clasifica", en: "AI extracts and classifies" }, tool: "OpenAI" },
@@ -110,27 +125,50 @@ export const lead: Scenario<Lead> = {
         : `Hi${first ? ` ${first}` : ""},\n\nThank you for reaching out. We received your ${label} and someone on the team will get back to you shortly with next steps.\n\nBest regards,\nThe team`,
     };
   },
-  decide(d, lang) {
+  decide(d, lang, s) {
     const es = lang === "es";
     const hot = d.urgency === "high" || d.intent === "complaint";
+    const reachable = !!(d.email || d.phone);
+    const outcome = !reachable ? "hold:no-contact" : hot ? "route:notify-now" : "route:queue";
+    const reason = {
+      "hold:no-contact": es
+        ? "Sin correo ni teléfono: no se crea un contacto vacío, se retiene y se piden los datos."
+        : "No e-mail or phone: no empty contact is created, it is held and details are requested.",
+      "route:notify-now": es
+        ? `Urgencia alta: se avisa a ventas ya, respuesta en ${s.hotMinutes} min.`
+        : `High urgency: sales is notified now, reply within ${s.hotMinutes} min.`,
+      "route:queue": es
+        ? `Sin urgencia: entra a la cola del CRM, respuesta en ${s.queueHours} h.`
+        : `Not urgent: goes into the CRM queue, reply within ${s.queueHours} h.`,
+    }[outcome];
     return {
-      outcome: hot ? "route:notify-now" : "route:queue",
-      reason: hot
-        ? es ? "Urgencia alta: se avisa a ventas de inmediato." : "High urgency: sales is notified right away."
-        : es ? "Sin urgencia: entra a la cola del CRM." : "Not urgent: goes into the CRM queue.",
+      outcome,
+      reason,
       checks: [
-        { label: es ? "Tiene forma de contacto" : "Has a contact method", ok: !!(d.email || d.phone) },
+        { label: es ? "Tiene forma de contacto" : "Has a contact method", ok: reachable },
         { label: es ? "Nombre identificado" : "Name identified", ok: !!d.name },
       ],
     };
   },
-  payload(d, decision) {
+  payload(d, decision, s): JsonObject {
+    if (decision.outcome === "hold:no-contact") {
+      return { held: { reason: "no_contact", summary: d.summary }, ask_for: ["name", "email_or_phone"], draft_reply: d.reply };
+    }
+    const hot = decision.outcome === "route:notify-now";
     return {
       contact: { name: d.name, company: d.company, email: d.email, phone: d.phone },
       deal: { stage: "new", type: d.intent, priority: d.urgency },
       tasks: d.tasks,
-      notify: decision.outcome === "route:notify-now" ? { channel: "#ventas", text: d.summary } : null,
+      reply_due: hot ? { minutes: s.hotMinutes } : { hours: s.queueHours },
+      notify: hot ? { channel: "#ventas", text: d.summary } : null,
       draft_reply: d.reply,
     };
   },
+  n8nRule: (s) => `// Rule node: deterministic, the model never decides.
+const d = $json.data;
+const reachable = !!(d.email || d.phone);
+const hot = d.urgency === "high" || d.intent === "complaint";
+const outcome = !reachable ? "hold:no-contact" : hot ? "route:notify-now" : "route:queue";
+const reply_due = hot ? { minutes: ${s.hotMinutes} } : { hours: ${s.queueHours} };
+return { data: d, decision: { outcome, reply_due } };`,
 };
