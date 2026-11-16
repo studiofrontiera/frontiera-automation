@@ -213,3 +213,12 @@ test("make export: valid blueprint, and its router filters give the same outcome
   const r = inv.makeRoutes({ ...defaults(inv), limitClp: 2_000_000 }, (k) => `4.${k}`);
   assert.deepEqual(r.filter((x) => makeMatch(x.when, big)).map((x) => x.outcome), ["auto:approved"], "slider value reaches the filter");
 });
+
+test("roi: computed only from the visitor's inputs", async () => {
+  const { roi } = await import("../roi.ts");
+  const r = roi({ volume: 300, minutes: 7, rate: 8000, review: 10, tools: 40000 });
+  assert.equal(r.manualMonth, 35 * 8000);
+  assert.equal(Math.round(r.hoursMonth * 10) / 10, 31.5);
+  assert.equal(r.netMonth, 280000 - (3.5 * 8000 + 40000));
+  assert.ok(roi({ volume: 10, minutes: 1, rate: 3000, review: 0, tools: 500000 }).netMonth < 0);
+});

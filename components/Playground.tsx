@@ -5,6 +5,7 @@ import { FILE_TYPES, MAX_FILE_BYTES, MAX_INPUT, SCENARIOS, complete, defaults } 
 import { toN8n } from "@/lib/playground/n8n";
 import { toMake } from "@/lib/playground/make";
 import { PartnerLinks } from "./PartnerLinks";
+import { RoiReport } from "./RoiReport";
 import type { FieldView, JsonObject, JsonValue, Lang, RunResult, Scenario, Settings } from "@/lib/playground/types";
 import type { Copy } from "@/lib/copy";
 import { download } from "@/lib/download";
@@ -24,7 +25,6 @@ export function Playground({ lang, c }: { lang: Lang; c: Copy["play"] }) {
   const [isEdge, setIsEdge] = useState(false);
   const [file, setFile] = useState<Upload | null>(null);
   const [settings, setSettings] = useState<Settings>(defaults(SCENARIOS[0]));
-  const [volume, setVolume] = useState(SCENARIOS[0].monthlyVolume);
   const [phase, setPhase] = useState<Phase>({ kind: "idle" });
   const [selected, setSelected] = useState(3);
   const [tab, setTab] = useState<"view" | "json">("view");
@@ -54,7 +54,6 @@ export function Playground({ lang, c }: { lang: Lang; c: Copy["play"] }) {
     setFileError(null);
     if (s.id !== scenario.id) {
       setSettings(defaults(s));
-      setVolume(s.monthlyVolume);
     }
     setPhase({ kind: "idle" });
     setSelected(3);
@@ -245,6 +244,19 @@ export function Playground({ lang, c }: { lang: Lang; c: Copy["play"] }) {
             </div>
           </div>
 
+          <section className="pane roi-pane" aria-label={c.roi.title}>
+            <div className="pane-head"><span className="mono">{c.roi.title}</span>{result && <span className={`badge badge-${result.mode}`}>{result.decision.outcome}</span>}</div>
+            <RoiReport
+              key={scenario.id}
+              lang={lang}
+              c={c.roi}
+              unit={scenario.volumeUnit[lang]}
+              defaultVolume={scenario.monthlyVolume}
+              defaultMinutes={scenario.manualMinutes}
+              flowSeconds={result ? Math.max(result.ms / 1000, 1) : null}
+            />
+          </section>
+
           <div className="pg-under">
             <div className="pane">
               <div className="pane-head"><span className="mono">{c.rulesTitle}</span></div>
@@ -275,35 +287,9 @@ export function Playground({ lang, c }: { lang: Lang; c: Copy["play"] }) {
               <p className="fine">{c.exportHint}</p>
               <PartnerLinks c={c} />
             </div>
-
-            <Savings scenario={scenario} result={result} volume={volume} setVolume={setVolume} lang={lang} c={c} />
           </div>
         </>
       )}
-    </div>
-  );
-}
-
-function Savings({ scenario, result, volume, setVolume, lang, c }: { scenario: Scenario; result: RunResult | null; volume: number; setVolume: (n: number) => void; lang: Lang; c: Copy["play"] }) {
-  const manualS = scenario.manualMinutes * 60;
-  /* Measured server time, counted as at least one second so the ratio never looks inflated. */
-  const flowS = result ? Math.max(result.ms / 1000, 1) : null;
-  const hours = Math.round((volume * scenario.manualMinutes) / 60);
-  const nf = (n: number) => n.toLocaleString(lang === "es" ? "es-CL" : "en-US");
-  return (
-    <div className="pane savings">
-      <div className="pane-head"><span className="mono">{lang === "es" ? "tiempo" : "time"}</span></div>
-      <div className="sav-row">
-        <div><span className="dim small-label">{c.manual}</span><span className="sav-num">~{scenario.manualMinutes} min</span></div>
-        <div><span className="dim small-label">{c.flow}</span><span className="sav-num accent">{flowS ? `${flowS.toFixed(1)} s` : "…"}</span></div>
-        <div><span className="dim small-label">{c.faster}</span><span className="sav-num">{flowS ? `${nf(Math.round(manualS / flowS))}×` : "…"}</span></div>
-      </div>
-      <label className="calc-field">
-        <span>{scenario.volumeUnit[lang]} <b>{nf(volume)}</b></span>
-        <input type="range" min={10} max={5000} step={10} value={volume} onChange={(e) => setVolume(Number(e.target.value))} />
-      </label>
-      <p className="sav-big"><span className="big">{nf(hours)}</span> <span className="dim">{c.freed}</span></p>
-      <p className="fine">{c.estimate}</p>
     </div>
   );
 }

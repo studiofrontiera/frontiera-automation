@@ -184,7 +184,7 @@ h2 { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -.02
 .record dd.null { color: var(--dim); font-style: italic; }
 .top0 { margin-top: 0; }
 
-.pg-under { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+.pg-under { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 18px; }
 @media (max-width: 920px) { .pg-under { grid-template-columns: 1fr; } }
 .sliders { display: grid; gap: 18px; margin-top: 14px; }
 .savings { display: grid; gap: 14px; align-content: start; }
@@ -266,3 +266,47 @@ h2 { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -.02
 .legal h1 { font-size: clamp(30px, 4vw, 42px); margin-top: 24px; }
 .legal h2 { font-size: 18px; margin: 28px 0 6px; letter-spacing: 0; }
 .legal p { color: var(--dim); margin: 0; }
+
+/* business case (ROI report) */
+.roi-pane { margin-top: 18px; }
+.roi-pane .pane-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.roi { display: grid; gap: 18px; }
+.roi-k { display: block; font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: .06em; font-family: var(--mono), monospace; }
+.roi-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.roi-kpi { background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 6px; min-width: 0; }
+.roi-kpi-main { border-color: var(--accent); background: linear-gradient(180deg, rgba(252, 101, 8, .12), rgba(252, 101, 8, .02)); }
+.roi-v { font-size: clamp(24px, 3.4vw, 36px); font-weight: 650; line-height: 1.1; overflow-wrap: anywhere; }
+.roi-kpi-main .roi-v { color: var(--accent); }
+.roi-s { font-size: 13px; color: var(--dim); }
+.roi-s b { color: var(--text); font-weight: 600; }
+.roi-case { display: grid; gap: 8px; }
+.roi-bar { position: relative; height: 30px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.roi-bar i { position: absolute; inset: 0 auto 0 0; background: var(--line-2); border-radius: 0 4px 4px 0; }
+.roi-bar-auto i { background: var(--accent); }
+.roi-bar span { position: relative; z-index: 1; display: flex; align-items: center; height: 100%; padding: 0 10px; font-size: 12px; }
+.roi-bar-auto span { padding-left: 14px; }
+.roi-chart { margin: 0; display: grid; gap: 8px; }
+.roi-legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--dim); }
+.roi-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.sw-manual { background: var(--dim); }
+.sw-auto { background: var(--accent); }
+.sw-gap { background: rgba(252, 101, 8, .28); }
+.roi-plot { position: relative; }
+.roi-plot svg { display: block; width: 100%; height: auto; overflow: visible; }
+.roi-plot .grid { stroke: var(--line); stroke-width: 1; }
+.roi-plot .axis { stroke: var(--line-2); stroke-width: 1; }
+.roi-plot .gap { fill: rgba(252, 101, 8, .16); }
+.roi-plot .ln { fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+.roi-plot .ln-manual { stroke: var(--dim); }
+.roi-plot .ln-auto { stroke: var(--accent); }
+.roi-plot .lbl { fill: var(--text); font: 600 12px var(--mono), monospace; }
+.roi-plot .tick { fill: var(--dim); font: 11px var(--mono), monospace; }
+.roi-plot .cross { stroke: var(--line-2); stroke-dasharray: 3 3; }
+.roi-plot .dot { stroke: var(--bg-2); stroke-width: 2; }
+.roi-plot .dot-manual { fill: var(--dim); }
+.roi-plot .dot-auto { fill: var(--accent); }
+.roi-tip { position: absolute; top: 4px; transform: translateX(-50%); background: var(--bg-3); border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 10px; font-size: 12px; display: grid; gap: 2px; pointer-events: none; white-space: nowrap; }
+.roi-axis { margin: 0; font-size: 11px; text-align: right; }
+.roi-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px 20px; }
+@media (max-width: 640px) { .roi-kpis { grid-template-columns: 1fr; } }

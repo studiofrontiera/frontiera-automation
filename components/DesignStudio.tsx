@@ -6,6 +6,7 @@ import type { Lang } from "@/lib/playground/types";
 import type { Copy } from "@/lib/copy";
 import { download } from "@/lib/download";
 import { PartnerLinks } from "./PartnerLinks";
+import { RoiReport } from "./RoiReport";
 
 type State = { kind: "idle" } | { kind: "running" } | { kind: "done"; design: Design; mode: "ai" | "rules"; ms: number } | { kind: "error"; message: string };
 
@@ -104,6 +105,11 @@ export function DesignStudio({ lang, c }: { lang: Lang; c: Copy["play"] }) {
                 ) : null
               )}
             </div>
+
+            <section className="pane roi-pane" aria-label={c.roi.title}>
+              <div className="pane-head"><span className="mono">{c.roi.title}</span></div>
+              <RoiReport lang={lang} c={c.roi} unit={c.roi.cases} defaultVolume={200} defaultMinutes={10} />
+            </section>
 
             <div className="design-actions">
               <button type="button" className="btn" onClick={() => want(state.design)}>{d.cta} <span aria-hidden="true">→</span></button>
