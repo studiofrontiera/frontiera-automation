@@ -3,6 +3,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FILE_TYPES, MAX_FILE_BYTES, MAX_INPUT, SCENARIOS, complete, defaults } from "@/lib/playground";
 import { toN8n } from "@/lib/playground/n8n";
+import { toMake } from "@/lib/playground/make";
+import { PartnerLinks } from "./PartnerLinks";
 import type { FieldView, JsonObject, JsonValue, Lang, RunResult, Scenario, Settings } from "@/lib/playground/types";
 import type { Copy } from "@/lib/copy";
 import { download } from "@/lib/download";
@@ -266,8 +268,12 @@ export function Playground({ lang, c }: { lang: Lang; c: Copy["play"] }) {
                 <button type="button" className="ghost" onClick={() => download(`frontiera-${scenario.id}.n8n.json`, toN8n(scenario, settings, lang))}>
                   ↓ {c.exportN8n}
                 </button>
+                <button type="button" className="ghost" onClick={() => download(`frontiera-${scenario.id}.make.json`, toMake(scenario, settings, lang))}>
+                  ↓ {c.exportMake}
+                </button>
               </div>
               <p className="fine">{c.exportHint}</p>
+              <PartnerLinks c={c} />
             </div>
 
             <Savings scenario={scenario} result={result} volume={volume} setVolume={setVolume} lang={lang} c={c} />

@@ -1,4 +1,4 @@
-import type { Scenario, Settings } from "../types.ts";
+import type { MakeCond, Scenario, Settings } from "../types.ts";
 
 type Item = { description: string; amount: number };
 type Invoice = {
@@ -224,4 +224,15 @@ const complete = !!(d.supplier && d.taxId && d.invoiceNumber && d.total != null)
 const big = d.total != null && d.total > LIMIT;
 const outcome = !complete || !sumOk || rut === false ? "review:data" : big ? "review:approval" : "auto:approved";
 return { data: d, decision: { outcome, checks: { complete, sumOk, rut, underLimit: !big } } };`,
+  makeRoutes(s, v) {
+    const req = ["supplier", "taxId", "invoiceNumber", "total", "net", "tax"];
+    const diff = `{{abs(${v("net")} + ${v("tax")} - ${v("total")})}}`;
+    const limit = `{{if(${v("currency")} = "CLP"; ${s.limitClp}; ${s.limitUsd})}}`;
+    const good: MakeCond[] = [...req.map((k) => ({ a: `{{${v(k)}}}`, o: "exist" })), { a: diff, o: "number:less", b: "1" }];
+    return [
+      { outcome: "review:data", label: "Missing data or amounts do not add up", when: [...req.map((k) => [{ a: `{{${v(k)}}}`, o: "notexist" }]), [{ a: diff, o: "number:greaterorequal", b: "1" }]] },
+      { outcome: "review:approval", label: "Total above the limit: a person approves", when: [[...good, { a: `{{${v("total")}}}`, o: "number:greater", b: limit }]] },
+      { outcome: "auto:approved", label: "Complete and under the limit: approved", when: [[...good, { a: `{{${v("total")}}}`, o: "number:lessorequal", b: limit }]] },
+    ];
+  },
 };

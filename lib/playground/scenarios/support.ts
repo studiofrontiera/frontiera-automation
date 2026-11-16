@@ -151,4 +151,11 @@ const escalate = d.sentiment === "negative" && d.priority === "high";
 const needsOrder = !d.orderId && (d.category === "shipping" || d.category === "billing");
 const outcome = "route:" + d.category + (escalate ? ":escalate" : "");
 return { data: d, decision: { outcome, sla_hours: SLA[d.priority], escalate, ask_customer: needsOrder ? ["order_id"] : [] } };`,
+  makeRoutes(_s, v) {
+    const f = (k: string) => `{{${v(k)}}}`;
+    return [
+      { outcome: `route:${f("category")}:escalate`, label: "Angry and urgent: team plus supervisor", when: [[{ a: f("sentiment"), o: "text:equal", b: "negative" }, { a: f("priority"), o: "text:equal", b: "high" }]] },
+      { outcome: `route:${f("category")}`, label: "Route to the team", when: [[{ a: f("sentiment"), o: "text:notequal", b: "negative" }], [{ a: f("priority"), o: "text:notequal", b: "high" }]] },
+    ];
+  },
 };

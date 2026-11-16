@@ -138,7 +138,7 @@ h2 { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -.02
   border-radius: 10px; padding: 14px; font: 13px/1.6 var(--mono), monospace;
 }
 .pane textarea:focus, .form input:focus, .form textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
-.pane-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12px; }
+.pane-foot { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 12px; }
 .seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; overflow: hidden; }
 .seg button { font: 12px var(--mono), monospace; background: none; color: var(--dim); border: 0; padding: 4px 10px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--bg-3); color: var(--text); }

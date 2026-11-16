@@ -23,6 +23,8 @@ Visitors can edit the input, run it, click any node to see its data as a readabl
 | **Documents** | The invoice scenario accepts a PDF or photo (3 MB). The AI transcribes it first, the workflow runs on the transcript, and grounding checks every field against that transcript. |
 | **Time saved** | Manual minutes per item (an estimate, labelled as such) against the measured run time, and hours a month at a volume the visitor sets. |
 | **Export to n8n** | Downloads an importable n8n workflow with the same steps: webhook, OpenAI with the strict schema, grounding, the rule node with the visitor's current settings, response. No key inside; it uses an n8n header credential. |
+| **Export to Make** | Downloads a Make scenario blueprint: webhook, OpenAI with the strict schema, parse, a router whose filters are the scenario's rules with the visitor's settings, webhook response. No key inside (placeholder header). Plain Make filters cannot run code, so grounding and the RUT check digit stay in the n8n version. A test checks that the filters reach the same outcome as the playground. |
+| **Partner links** | "Sign up for Make" and "Try n8n Cloud" next to the exports. Set `NEXT_PUBLIC_MAKE_REF_URL` / `NEXT_PUBLIC_N8N_REF_URL` to affiliate links; the affiliate disclosure appears only when one is set. |
 | **Your process** | The visitor describes any process in plain words and the AI drafts an automation as trigger, AI, rule, human approval and action steps, with data, rules, risks and discovery questions. Exportable to n8n as a skeleton, or sent to the contact form in one click. |
 
 ### How the AI is kept honest
@@ -68,7 +70,7 @@ Without `OPENAI_API_KEY` the playground runs in rule-based mode.
 app/            routes: /, /en, /privacidad, /en/privacy, /api/playground, /api/design, sitemap, robots
 components/     Home, Playground and DesignStudio (client), JsonView, Calculator (client), Privacy
 lib/            copy (ES/EN text), metadata helpers
-lib/playground/ scenarios, validation and grounding, AI step, n8n export, process designer, spend guard, tests
+lib/playground/ scenarios, validation and grounding, AI step, n8n and Make export, process designer, spend guard, tests
 ```
 
 ## Notes

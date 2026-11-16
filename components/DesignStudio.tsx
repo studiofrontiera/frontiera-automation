@@ -5,6 +5,7 @@ import { MAX_DESIGN_INPUT, designSamples, designToN8n, type Design } from "@/lib
 import type { Lang } from "@/lib/playground/types";
 import type { Copy } from "@/lib/copy";
 import { download } from "@/lib/download";
+import { PartnerLinks } from "./PartnerLinks";
 
 type State = { kind: "idle" } | { kind: "running" } | { kind: "done"; design: Design; mode: "ai" | "rules"; ms: number } | { kind: "error"; message: string };
 
@@ -109,6 +110,7 @@ export function DesignStudio({ lang, c }: { lang: Lang; c: Copy["play"] }) {
               <button type="button" className="ghost" onClick={() => download("frontiera-draft.n8n.json", designToN8n(state.design, lang))}>↓ {c.exportN8n}</button>
             </div>
             <p className="fine">{d.note}</p>
+            <PartnerLinks c={c} />
           </div>
         )}
       </div>

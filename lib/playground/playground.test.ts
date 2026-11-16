@@ -4,6 +4,8 @@ import { SCENARIOS, complete, defaults, getScenario, sanitizeSettings } from "./
 import { conformObject, ground } from "./validate.ts";
 import { parseAmount, rutValid } from "./scenarios/invoice.ts";
 import { toN8n } from "./n8n.ts";
+import { toMake } from "./make.ts";
+import type { JsonObject, MakeCond } from "./types.ts";
 import { designFallback, designSchema, designToN8n } from "./design.ts";
 
 test("every scenario runs end to end on its own samples, in both languages", () => {
@@ -153,4 +155,61 @@ test("design: fallback fits the schema and exports to n8n", () => {
     assert.equal(wf.nodes.length, d.steps.length + 1);
     assert.ok(!JSON.stringify(d).includes("\u2014"));
   }
+});
+
+/** Evaluates Make mappings like {{4.total}}, {{abs(4.net + 4.tax - 4.total)}}, {{if(4.currency = "CLP"; 1; 2)}}. */
+function makeEval(value: string, d: JsonObject): unknown {
+  const expr = (e: string) => {
+    const js = e.replace(/\b4\.(\w+)/g, 'd["$1"]').replace(/;/g, ",").replace(/\bif\(/g, "iff(").replace(/ = /g, " === ").replace(/\babs\(/g, "Math.abs(");
+    return new Function("d", "iff", `return (${js});`)(d, (c: boolean, a: unknown, b: unknown) => (c ? a : b));
+  };
+  const whole = value.match(/^\{\{(.*)\}\}$/);
+  if (whole) return expr(whole[1]);
+  return value.replace(/\{\{(.*?)\}\}/g, (_, e) => String(expr(e)));
+}
+function makeMatch(when: MakeCond[][], d: JsonObject): boolean {
+  return when.some((group) =>
+    group.every(({ a, o, b }) => {
+      const x = makeEval(a, d);
+      const y = b === undefined ? undefined : makeEval(b, d);
+      const present = x !== null && x !== undefined && x !== "";
+      switch (o) {
+        case "exist": return present;
+        case "notexist": return !present;
+        case "text:equal": return String(x) === String(y);
+        case "text:notequal": return String(x) !== String(y);
+        case "number:less": return Number(x) < Number(y);
+        case "number:lessorequal": return Number(x) <= Number(y);
+        case "number:greater": return Number(x) > Number(y);
+        case "number:greaterorequal": return Number(x) >= Number(y);
+        default: throw new Error(`unknown operator ${o}`);
+      }
+    })
+  );
+}
+
+test("make export: valid blueprint, and its router filters give the same outcome as the playground", () => {
+  for (const s of SCENARIOS) {
+    const bp = toMake(s, defaults(s), "es");
+    const ai = bp.flow.find((m) => m.module === "http:ActionSendData")!;
+    const body = String((ai.mapper as JsonObject).data).replace("{{2.json}}", JSON.stringify("hola \"mundo\""));
+    const req = JSON.parse(body);
+    assert.equal(req.input[1].content[0].text, 'hola "mundo"');
+    assert.equal(req.text.format.strict, true);
+    assert.ok(!JSON.stringify(bp).includes("sk-"), "no key inside");
+    const routes = s.makeRoutes(defaults(s), (k) => `4.${k}`);
+    for (const lang of ["es", "en"] as const) {
+      for (const text of [s.sample[lang], s.edge[lang]]) {
+        const d = s.fallback(text, lang);
+        const expected = s.decide(d, lang, defaults(s)).outcome;
+        /* Make has no check-digit filter: a bad RUT alone is the one case where only n8n catches it. */
+        const matched = routes.filter((r) => makeMatch(r.when, d)).map((r) => makeEval(r.outcome, d));
+        assert.deepEqual(matched, [expected], `${s.id}/${lang}`);
+      }
+    }
+  }
+  const inv = getScenario("invoice")!;
+  const big = { ...inv.fallback(inv.sample.es, "es"), total: 1_190_000 };
+  const r = inv.makeRoutes({ ...defaults(inv), limitClp: 2_000_000 }, (k) => `4.${k}`);
+  assert.deepEqual(r.filter((x) => makeMatch(x.when, big)).map((x) => x.outcome), ["auto:approved"], "slider value reaches the filter");
 });

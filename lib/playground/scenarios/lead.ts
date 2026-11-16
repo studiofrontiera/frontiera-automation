@@ -171,4 +171,24 @@ const hot = d.urgency === "high" || d.intent === "complaint";
 const outcome = !reachable ? "hold:no-contact" : hot ? "route:notify-now" : "route:queue";
 const reply_due = hot ? { minutes: ${s.hotMinutes} } : { hours: ${s.queueHours} };
 return { data: d, decision: { outcome, reply_due } };`,
+  makeRoutes(_s, v) {
+    const f = (k: string) => `{{${v(k)}}}`;
+    const contacts = ["email", "phone"];
+    return [
+      { outcome: "hold:no-contact", label: "No e-mail or phone: hold and ask", when: [[{ a: f("email"), o: "notexist" }, { a: f("phone"), o: "notexist" }]] },
+      {
+        outcome: "route:notify-now",
+        label: "Urgent or complaint: notify sales now",
+        when: contacts.flatMap((c) => [
+          [{ a: f(c), o: "exist" }, { a: f("urgency"), o: "text:equal", b: "high" }],
+          [{ a: f(c), o: "exist" }, { a: f("intent"), o: "text:equal", b: "complaint" }],
+        ]),
+      },
+      {
+        outcome: "route:queue",
+        label: "Not urgent: CRM queue",
+        when: contacts.map((c) => [{ a: f(c), o: "exist" }, { a: f("urgency"), o: "text:notequal", b: "high" }, { a: f("intent"), o: "text:notequal", b: "complaint" }]),
+      },
+    ];
+  },
 };

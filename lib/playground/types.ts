@@ -84,7 +84,13 @@ export type Scenario<T extends JsonObject = JsonObject> = {
   payload: (data: T, decision: Decision, settings: Settings) => JsonObject;
   /** JavaScript for the rule node of the exported n8n workflow; `data` holds the extracted fields. */
   n8nRule: (settings: Settings) => string;
+  /** The same rules as Make router filters. `v(key)` gives the mapping of a parsed field. */
+  makeRoutes: (settings: Settings, v: (key: string) => string) => MakeRoute[];
 };
+
+/** A Make filter condition. Outer array of `when` = OR, inner array = AND (Make's own format). */
+export type MakeCond = { a: string; o: string; b?: string };
+export type MakeRoute = { outcome: string; label: string; when: MakeCond[][] };
 
 export type RunResult = {
   scenario: string;
