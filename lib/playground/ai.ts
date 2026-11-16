@@ -31,7 +31,7 @@ async function respond(system: string, user: Content[], opts: { schema?: ObjectS
         ],
         ...(opts.schema ? { text: { format: { type: "json_schema", name: opts.name ?? "out", strict: true, schema: opts.schema } } } : {}),
       }),
-      signal: AbortSignal.timeout(25_000),
+      signal: AbortSignal.timeout(opts.maxTokens > 1500 ? 38_000 : 25_000),
     });
     if (!res.ok) {
       /* Status and error code only: never the visitor's text. */
