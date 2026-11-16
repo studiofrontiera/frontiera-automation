@@ -33,10 +33,16 @@ async function respond(system: string, user: Content[], opts: { schema?: ObjectS
       }),
       signal: AbortSignal.timeout(25_000),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      /* Status and error code only: never the visitor's text. */
+      const err = (await res.json().catch(() => null)) as { error?: { code?: string; type?: string; param?: string } } | null;
+      console.error("playground_ai_error", res.status, err?.error?.code ?? err?.error?.type ?? "unknown", err?.error?.param ?? "");
+      return null;
+    }
     const body = (await res.json()) as ResponsesBody;
     return body.output_text ?? body.output?.flatMap((o) => o.content ?? []).find((c) => c.type === "output_text")?.text ?? null;
-  } catch {
+  } catch (e) {
+    console.error("playground_ai_error", "exception", e instanceof Error ? e.name : "unknown");
     return null;
   }
 }
