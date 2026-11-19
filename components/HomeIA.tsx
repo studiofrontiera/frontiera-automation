@@ -1,18 +1,14 @@
 import Link from "next/link";
 import { FORM_ACTION, WHATSAPP } from "@/lib/copy";
 import { AiRadar } from "./AiRadar";
+import { Waffle } from "./Waffle";
 
 const PEW = "https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/";
-const BARS = [
-  { l: "Sin respuesta de IA: clic en un resultado", v: 15, hot: false },
-  { l: "Con respuesta de IA: clic en un resultado", v: 8, hot: false },
-  { l: "Clic en un enlace dentro de la respuesta", v: 1, hot: true },
-];
 
 const PLANS = [
-  { k: "01", t: "Diagnóstico IA", p: "USD 290", n: "5 días", b: "Qué responden ChatGPT, Claude, Gemini y Perplexity sobre su rubro, y por qué eligen a otros." },
-  { k: "02", t: "Presencia IA", p: "USD 900", n: "+ USD 150/mes", b: "Su información lista para que la IA la cite. Medición mensual." },
-  { k: "03", t: "Conector propio", p: "desde USD 2.500", n: "+ mantención", b: "La IA consulta sus precios y agenda y vende por usted." },
+  { k: "01", tag: "Empiece aquí", t: "Diagnóstico IA", p: "USD 290", n: "una vez · 5 días", items: ["20 preguntas reales de sus clientes", "ChatGPT, Claude, Gemini y Perplexity", "Quién gana cada respuesta y por qué"] },
+  { k: "02", tag: "Aparecer", t: "Presencia IA", p: "USD 900", n: "+ USD 150 al mes", items: ["Su información lista para que la IA la cite", "Fichas en las fuentes que la IA lee", "Medición mensual del ranking"] },
+  { k: "03", tag: "Vender", t: "Conector propio", p: "desde USD 2.500", n: "+ mantención", items: ["La IA consulta sus precios y agenda", "Cotiza y reserva dentro del chat", "Para ChatGPT y Claude"] },
 ];
 
 export function HomeIA() {
@@ -23,7 +19,6 @@ export function HomeIA() {
           <Link className="brand" href="/" aria-label="FRONTIERA">
             {/* eslint-disable-next-line @next/next/no-img-element -- brand asset */}
             <img src="/frontiera-wordmark.webp" alt="FRONTIERA" width={520} height={66} />
-            <span className="brand-tag mono">IA · B2B</span>
           </Link>
           <nav className="nav">
             <a href="#radar">Probar</a>
@@ -48,16 +43,13 @@ export function HomeIA() {
         <section className="sec sec-line" id="por-que">
           <div className="wrap">
             <p className="label mono">{"// "}Por qué</p>
-            <h2>Cuando la IA responde, nadie entra a su sitio.</h2>
-            <div className="ia-bars" role="img" aria-label="Clics en Google: 15% sin resumen de IA, 8% con resumen, 1% en enlaces del resumen">
-              {BARS.map((b) => (
-                <div className={`ia-bar${b.hot ? " hot" : ""}`} key={b.l}>
-                  <span className="ia-bar-l">{b.l}</span>
-                  <span className="ia-bar-t"><i style={{ width: `${(b.v / 15) * 100}%` }} /></span>
-                  <b className="mono">{b.v}%</b>
-                </div>
-              ))}
+            <h2>De cada 100 búsquedas, cuántas llegan a un sitio.</h2>
+            <div className="waffles">
+              <Waffle value={15} label="sin respuesta de IA" />
+              <Waffle value={8} label="con respuesta de IA" />
+              <Waffle value={1} label="clic dentro de la respuesta de IA" hot />
             </div>
+            <p className="ia-punch">Cuando la IA responde, <span className="accent">99 de cada 100</span> personas no hacen clic en los enlaces de la respuesta.</p>
             <p className="fine">Visitas a Google que terminan en un clic. Fuente: <a className="link" href={PEW} target="_blank" rel="noopener noreferrer">Pew Research Center, julio 2025</a>, 900 adultos en EE.UU.</p>
           </div>
         </section>
@@ -66,20 +58,30 @@ export function HomeIA() {
           <div className="wrap">
             <p className="label mono">{"// "}Oferta</p>
             <h2>Pase del lado derecho.</h2>
-            <div className="ia-plans">
+            <ol className="path">
               {PLANS.map((p) => (
-                <article key={p.k} className="ia-plan">
-                  <span className="mono accent">{p.k}</span>
-                  <h3>{p.t}</h3>
-                  <p>{p.b}</p>
-                  <div className="mono"><b>{p.p}</b> <span className="dim">{p.n}</span></div>
-                </article>
+                <li key={p.k} className="path-step">
+                  <span className="path-dot mono">{p.k}</span>
+                  <article className="path-card">
+                    <span className="path-tag mono">{p.tag}</span>
+                    <h3>{p.t}</h3>
+                    <ul>{p.items.map((x) => <li key={x}>{x}</li>)}</ul>
+                    <div className="path-price"><b className="mono">{p.p}</b><span className="dim mono">{p.n}</span></div>
+                  </article>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
-        <section className="sec sec-line" id="contacto">
+        <section className="finale">
+          <div className="wrap finale-in">
+            <h2>Que la IA lo recomiende <span className="accent">a usted.</span></h2>
+            <a className="btn" href="#contacto">Pedir diagnóstico <span aria-hidden="true">→</span></a>
+          </div>
+        </section>
+
+        <section className="sec" id="contacto">
           <div className="wrap contact">
             <div>
               <h2>Empiece por saber dónde está.</h2>
