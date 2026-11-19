@@ -120,12 +120,14 @@ export function fixesFor(s: number, total: number): string[] {
 }
 
 /** Example shown before the first run and when no AI key is configured. Clearly fictitious. */
-export const RADAR_DEMO: RadarAnswer[] = questions("servicios contables", "Santiago").map((q, i) => ({
+export const DEMO_COMPANY = "Grúas Andes";
+export const DEMO_RUBRO = "arriendo de grúas horquilla";
+export const RADAR_DEMO: RadarAnswer[] = questions(DEMO_RUBRO, "Santiago").map((q, i) => ({
   question: q,
   companies: [
-    { name: "Contadores Andes (ejemplo)", why: "Muchas reseñas y precios publicados" },
-    { name: "Cuentas Claras (ejemplo)", why: "Especialistas en pymes" },
-    ...(i % 2 === 0 ? [{ name: "Su Empresa (ejemplo)", why: "Aparece en un directorio del rubro" }] : []),
-    { name: "Balance Pro (ejemplo)", why: "Atención online" },
+    { name: "Elevadores Sur", why: "Flota grande y reseñas positivas" },
+    { name: "GrúaMax", why: "Precios publicados y entrega en el día" },
+    { name: "Montacargas Centro", why: "Atención a pymes" },
+    ...(i === 4 ? [{ name: DEMO_COMPANY, why: "Aparece en un directorio del rubro" }] : []),
   ],
 }));

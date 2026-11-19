@@ -380,3 +380,25 @@ h2 { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -.02
 .ia-plan p { margin: 0; color: var(--dim); }
 .ia-plan b { font-size: 18px; color: var(--text); }
 @media (min-width: 901px) { .ia-steps3 { grid-template-columns: repeat(3, 1fr); } }
+/* two-pane comparison: the AI today vs the AI with the company's connector */
+.ia-hero .radar { margin-top: 32px; }
+.vs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; transition: opacity .2s; }
+.vs.is-busy { opacity: .45; }
+@media (max-width: 760px) { .vs { grid-template-columns: 1fr; } }
+.vs-pane { background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: grid; gap: 12px; align-content: start; }
+.vs-pane.good { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(252, 101, 8, .12); }
+.vs-head { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--dim); }
+.vs-head .bad { color: var(--dim); font-weight: 500; }
+.vs-head .ok { color: var(--accent); font-weight: 500; }
+.vs-q { justify-self: end; margin: 0; background: var(--bg-3); border-radius: 12px 12px 3px 12px; padding: 8px 12px; max-width: 90%; font-size: 15px; }
+.vs-call { margin: 0; font-size: 12px; color: var(--accent); background: rgba(252, 101, 8, .08); border-radius: 6px; padding: 6px 9px; overflow-x: auto; white-space: nowrap; }
+.vs-a { border: 1px solid var(--line-2); border-radius: 12px 12px 12px 3px; padding: 12px 14px; font-size: 15px; }
+.vs-a p { margin: 0; }
+.vs-a ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+.vs-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.vs-buy { background: var(--accent); color: #0b0b0b; border-radius: 8px; padding: 8px 13px; font-weight: 650; font-size: 14px; }
+.vs-alt { border: 1px solid var(--line-2); border-radius: 8px; padding: 8px 13px; font-size: 14px; color: var(--dim); }
+.vs-verdict { margin: 0; font-size: 13px; }
+.vs-verdict.bad { color: var(--dim); }
+.vs-verdict.ok { color: var(--accent); }
+.ia-hero .lead { margin-bottom: 0; }

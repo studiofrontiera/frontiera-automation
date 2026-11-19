@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { RADAR_DEMO, score, type RadarResult } from "@/lib/radar";
+import { DEMO_COMPANY, DEMO_RUBRO, RADAR_DEMO, score, type RadarResult } from "@/lib/radar";
 
-const EXAMPLE = score("Su Empresa (ejemplo)", "servicios contables", "Santiago", RADAR_DEMO, "demo");
+const EXAMPLE = score(DEMO_COMPANY, DEMO_RUBRO, "Santiago", RADAR_DEMO, "demo");
 
 const ERRORS: Record<string, string> = {
-  length: "Escriba el nombre de su empresa y su rubro.",
+  length: "Escriba su empresa y qué vende.",
   rate_limited: "Demasiadas consultas seguidas. Espere un minuto.",
-  daily_limit: "Llegó al límite de consultas de hoy. Pida el diagnóstico completo abajo.",
-  ai_unavailable: "La IA no respondió esta vez. Intente de nuevo en un momento.",
+  daily_limit: "Llegó al límite de hoy. Pida el diagnóstico completo.",
+  ai_unavailable: "La IA no respondió. Intente de nuevo.",
 };
 
+/** One window, two answers to the same question: the AI today, and the AI with the company's connector. */
 export function AiRadar() {
   const [company, setCompany] = useState("");
   const [rubro, setRubro] = useState("");
@@ -36,59 +37,45 @@ export function AiRadar() {
     }
   }
 
-  const pct = r.total ? r.score / r.total : 0;
-  const max = Math.max(...r.ranking.map((x) => x.count), 1);
-  const C = 2 * Math.PI * 52;
+  const q = r.answers[0];
+  const others = (q?.companies ?? []).filter((c) => !c.name || c.name !== r.company).slice(0, 3);
 
   return (
     <div className="radar">
       <form className="radar-form" onSubmit={run}>
-        <label><span>Su empresa</span><input id="radar-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Nombre comercial" required maxLength={80} /></label>
-        <label><span>Qué vende</span><input id="radar-rubro" value={rubro} onChange={(e) => setRubro(e.target.value)} placeholder="ej. arriendo de grúas horquilla" required maxLength={80} /></label>
+        <label><span>Su empresa</span><input id="radar-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder={DEMO_COMPANY} required maxLength={80} /></label>
+        <label><span>Qué vende</span><input id="radar-rubro" value={rubro} onChange={(e) => setRubro(e.target.value)} placeholder={DEMO_RUBRO} required maxLength={80} /></label>
         <label><span>Ciudad</span><input id="radar-ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} maxLength={80} /></label>
-        <button className="btn" type="submit" disabled={busy}>{busy ? "Preguntando a la IA…" : "Preguntar a la IA"}</button>
+        <button className="btn" type="submit" disabled={busy}>{busy ? "Preguntando…" : "Probar"}</button>
       </form>
       {err && <p className="radar-err" role="alert">{err}</p>}
 
-      <div className={`radar-out${busy ? " is-busy" : ""}`} aria-live="polite">
-        {r.source === "demo" && <p className="radar-demo mono">Ejemplo con empresas ficticias. Escriba los datos de su empresa para ver su resultado real.</p>}
-        <div className="radar-top">
-          <figure className="radar-ring" aria-label={`Visibilidad: ${r.score} de ${r.total}`}>
-            <svg viewBox="0 0 120 120">
-              <circle cx="60" cy="60" r="52" className="ring-bg" />
-              <circle cx="60" cy="60" r="52" className="ring-fg" strokeDasharray={`${C * pct} ${C}`} transform="rotate(-90 60 60)" />
-            </svg>
-            <figcaption><b className="mono">{r.score}/{r.total}</b><span>respuestas lo nombran</span></figcaption>
-          </figure>
-          <div className="radar-rank">
-            <p className="label mono">{"// "}A quién recomienda la IA</p>
-            {r.ranking.map((x) => (
-              <div className={`rank-row${x.you ? " you" : ""}`} key={x.name}>
-                <span className="rank-name">{x.name}</span>
-                <span className="rank-bar"><i style={{ width: `${(x.count / max) * 100}%` }} /></span>
-                <span className="mono">{x.count}</span>
-              </div>
-            ))}
+      <div className={`vs${busy ? " is-busy" : ""}`} aria-live="polite">
+        <section className="vs-pane">
+          <header className="vs-head mono"><span>Hoy</span><b className="bad">{r.score}/{r.total} respuestas lo nombran</b></header>
+          <p className="vs-q">{q?.question}</p>
+          <div className="vs-a">
+            {others.length ? (
+              <ol>{others.map((c) => <li key={c.name}><b>{c.name}</b> <span className="dim">· {c.why}</span></li>)}</ol>
+            ) : <p className="dim">La IA no nombró empresas.</p>}
           </div>
-        </div>
+          <p className="vs-verdict bad mono">→ El cliente se va con {others[0]?.name ?? "otro"}</p>
+        </section>
 
-        <ol className="radar-qs">
-          {r.answers.map((a) => (
-            <li key={a.question}>
-              <span className={`q-mark mono${a.hit ? " ok" : ""}`}>{a.hit ? `#${a.hit}` : "×"}</span>
-              <div>
-                <p className="q-text">{a.question}</p>
-                <p className="q-names dim">{a.companies.length ? a.companies.map((c) => c.name).join(" · ") : "La IA no nombró empresas"}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
-
-        <ul className="radar-fixes">
-          {r.fixes.map((f) => <li key={f}>{f}</li>)}
-        </ul>
-        <p className="fine">Respuestas generadas por un modelo de OpenAI con búsqueda web, sin decirle qué empresa medimos. ChatGPT, Claude o Gemini pueden responder distinto, por eso el diagnóstico completo los revisa todos.</p>
+        <section className="vs-pane good">
+          <header className="vs-head mono"><span>Con su conector</span><b className="ok">venta en el chat</b></header>
+          <p className="vs-q">{q?.question}</p>
+          <p className="vs-call mono">{slug(r.company)} · consultar_disponibilidad()</p>
+          <div className="vs-a">
+            <p><b>{r.company}</b> ofrece {r.rubro} en {r.ciudad} y tiene disponibilidad esta semana. Puedo pedirle la cotización ahora.</p>
+            <div className="vs-btns"><span className="vs-buy">Cotizar con {r.company}</span><span className="vs-alt">Ver condiciones</span></div>
+          </div>
+          <p className="vs-verdict ok mono">→ El cliente compra con usted</p>
+        </section>
       </div>
+      <p className="fine">{r.source === "demo" ? "Ejemplo con empresas ficticias. " : "Izquierda: respuesta real de un modelo de OpenAI con búsqueda web, sin saber qué empresa medimos. "}Derecha: simulación de lo que hace un conector.</p>
     </div>
   );
 }
+
+const slug = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "su-empresa";

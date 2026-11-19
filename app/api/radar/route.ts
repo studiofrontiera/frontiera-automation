@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { RADAR_DEMO, RADAR_LIMITS, questions, score } from "@/lib/radar";
+import { DEMO_COMPANY, DEMO_RUBRO, RADAR_DEMO, RADAR_LIMITS, questions, score } from "@/lib/radar";
 import { askAssistant } from "@/lib/radar-ai";
 import { aiConfigured } from "@/lib/playground/ai";
 import { burstLimited, clientIp, takeAi } from "@/lib/playground/budget";
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
   const company = field(body.company), rubro = field(body.rubro), ciudad = field(body.ciudad) || "Santiago";
   if (company.length < 2 || rubro.length < 3) return error("length", 400);
 
-  if (!aiConfigured()) return NextResponse.json(score("Su Empresa (ejemplo)", "servicios contables", "Santiago", RADAR_DEMO, "demo"));
+  if (!aiConfigured()) return NextResponse.json(score(DEMO_COMPANY, DEMO_RUBRO, "Santiago", RADAR_DEMO, "demo"));
   /* A radar run costs about as much as several playground runs. */
   if (!takeAi(ip, 4)) return error("daily_limit", 429);
   const answers = await askAssistant(questions(rubro, ciudad));
