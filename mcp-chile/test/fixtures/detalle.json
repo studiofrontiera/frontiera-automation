@@ -1,0 +1,4 @@
+{"Cantidad":1,"Listado":[{"CodigoExterno":"3333-33-L126","Nombre":"Grabación de VIDEO institucional","Descripcion":"Ficticio para pruebas","Tipo":"L1","MontoEstimado":4500000,"Moneda":"CLP",
+"Comprador":{"NombreOrganismo":"Organismo de prueba","RegionUnidad":"Región Metropolitana de Santiago"},
+"Fechas":{"FechaPublicacion":"2026-11-14T10:00:00","FechaFinal":"2026-11-18T18:00:00","FechaCierre":"2026-11-21T12:00:00","FechaEstimadaAdjudicacion":"2026-12-05T00:00:00"},
+"Items":{"Cantidad":1,"Listado":[{"NombreProducto":"Servicio de video","Descripcion":"Video de 3 minutos","Cantidad":1,"UnidadMedida":"Unidad"}]}}]}

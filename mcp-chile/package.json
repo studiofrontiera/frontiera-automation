@@ -1,0 +1,10 @@
+{
+  "name": "frontiera-mcp-chile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP server: Chilean public tenders (Mercado Publico) and SME calculations for Claude and ChatGPT",
+  "type": "module",
+  "bin": { "frontiera-mcp-chile": "src/server.js" },
+  "scripts": { "start": "node src/server.js", "test": "node --test test/*.test.js" },
+  "dependencies": { "@modelcontextprotocol/sdk": "1.32.2", "zod": "3.25.76" }
+}
