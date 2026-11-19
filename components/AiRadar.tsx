@@ -86,7 +86,7 @@ export function AiRadar() {
 
         <div className="vs" aria-live="polite" key={run}>
           <section className="vs-pane">
-            <header className="vs-head mono"><span>Hoy</span><b className="bad">{q?.hit ? `usted sale #${q.hit}` : "usted no aparece"}</b></header>
+            <header className="vs-head mono"><span><i className="live-dot" aria-hidden="true" />{demo ? "Hoy · ejemplo" : "ChatGPT · respuesta real"}</span><b className="bad">{q?.hit ? `usted sale #${q.hit}` : "usted no aparece"}</b></header>
             <p className="vs-q">{q?.question}</p>
             <div className="vs-a">
               {list.length ? (
@@ -101,7 +101,7 @@ export function AiRadar() {
           </section>
 
           <section className="vs-pane good">
-            <header className="vs-head mono"><span>Con su conector</span><b className="ok">venta en el chat</b></header>
+            <header className="vs-head mono"><span>Con su conector · simulación</span><b className="ok">venta en el chat</b></header>
             <p className="vs-q">{q?.question}</p>
             <ol className="vs-steps mono">
               <li className="pop" style={{ animationDelay: ".2s" }}><i>✓</i>{slug(r.company)} · consultar_catalogo()</li>
