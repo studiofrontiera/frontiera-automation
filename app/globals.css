@@ -402,3 +402,12 @@ h2 { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.1; letter-spacing: -.02
 .vs-verdict.bad { color: var(--dim); }
 .vs-verdict.ok { color: var(--accent); }
 .ia-hero .lead { margin-bottom: 0; }
+.ia-bars { display: grid; gap: 18px; margin-top: 28px; max-width: 900px; }
+.ia-bar { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr) 64px; gap: 16px; align-items: center; }
+@media (max-width: 640px) { .ia-bar { grid-template-columns: minmax(0, 1fr) 56px; } .ia-bar-l { grid-column: 1 / -1; } }
+.ia-bar-l { color: var(--dim); font-size: 14px; }
+.ia-bar-t { height: 28px; background: var(--bg-2); border-radius: 6px; overflow: hidden; }
+.ia-bar-t i { display: block; height: 100%; background: var(--line-2); border-radius: 6px; min-width: 6px; }
+.ia-bar b { font-size: 30px; text-align: right; }
+.ia-bar.hot .ia-bar-t i { background: var(--accent); }
+.ia-bar.hot b, .ia-bar.hot .ia-bar-l { color: var(--accent); }
