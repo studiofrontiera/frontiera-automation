@@ -6,9 +6,9 @@ import { Waffle } from "./Waffle";
 const PEW = "https://www.pewresearch.org/short-reads/2025/07/22/google-users-are-less-likely-to-click-on-links-when-an-ai-summary-appears-in-the-results/";
 
 const PLANS = [
-  { k: "01", tag: "Empiece aquí", t: "Diagnóstico IA", p: "USD 290", n: "una vez · 5 días", items: ["20 preguntas reales de sus clientes", "ChatGPT, Claude, Gemini y Perplexity", "Quién gana cada respuesta y por qué"] },
-  { k: "02", tag: "Aparecer", t: "Presencia IA", p: "USD 900", n: "+ USD 150 al mes", items: ["Su información lista para que la IA la cite", "Fichas en las fuentes que la IA lee", "Medición mensual del ranking"] },
-  { k: "03", tag: "Vender", t: "Conector propio", p: "desde USD 2.500", n: "+ mantención", items: ["La IA consulta sus precios y agenda", "Cotiza y reserva dentro del chat", "Para ChatGPT y Claude"] },
+  { k: "01", tag: "Empiece aquí", t: "Diagnóstico IA", p: "Gratis", n: "ahora mismo, arriba", items: ["3 preguntas reales de sus clientes", "Qué sabe la IA de su empresa", "Quién se lleva sus clientes"] },
+  { k: "02", tag: "Si la IA no lo nombra", t: "Presencia IA", p: "USD 900", n: "+ USD 150 al mes", items: ["Su información lista para que la IA la cite", "Fichas en las fuentes que la IA lee", "Medición mensual frente a su competencia"] },
+  { k: "03", tag: "Si la IA ya lo nombra", t: "Conector propio", p: "desde USD 2.500", n: "+ mantención", items: ["La IA consulta su catálogo, precio y stock", "Cotiza y vende dentro del chat", "Para ChatGPT y Claude"] },
 ];
 
 export function HomeIA() {
@@ -25,7 +25,7 @@ export function HomeIA() {
             <a href="#por-que">Por qué</a>
             <a href="#oferta">Oferta</a>
           </nav>
-          <div className="top-act"><a className="btn btn-sm" href="#contacto">Diagnóstico</a></div>
+          <div className="top-act"><a className="btn btn-sm" href="#radar">Diagnóstico gratis</a></div>
         </div>
       </header>
 
@@ -35,7 +35,7 @@ export function HomeIA() {
           <div className="wrap">
             <p className="kicker mono">Empresas B2B · Chile</p>
             <h1 className="ia-h1">Su <s>sitio web</s> <span className="accent">ya no vende.</span></h1>
-            <p className="lead">Sus clientes le preguntan a ChatGPT. Pruebe qué les responde.</p>
+            <p className="lead">Sus clientes le preguntan a ChatGPT. Vea gratis qué les responde.</p>
             <AiRadar />
           </div>
         </section>
@@ -77,19 +77,19 @@ export function HomeIA() {
         <section className="finale">
           <div className="wrap finale-in">
             <h2>Que la IA lo recomiende <span className="accent">a usted.</span></h2>
-            <a className="btn" href="#contacto">Pedir diagnóstico <span aria-hidden="true">→</span></a>
+            <a className="btn" href="#radar">Hacer diagnóstico gratis <span aria-hidden="true">→</span></a>
           </div>
         </section>
 
         <section className="sec" id="contacto">
           <div className="wrap contact">
             <div>
-              <h2>Empiece por saber dónde está.</h2>
+              <h2>¿Prefiere conversarlo?</h2>
               <p className="sub">Respondemos en un día hábil.</p>
               <a className="link" href={WHATSAPP.es} target="_blank" rel="noopener noreferrer">WhatsApp →</a>
             </div>
             <form className="form" action={FORM_ACTION} method="post">
-              <input type="hidden" name="_subject" value="Diagnóstico IA · frontiera.cl" />
+              <input type="hidden" name="_subject" value="Contacto · frontiera.cl" />
               <input type="hidden" name="_template" value="table" />
               <input type="hidden" name="_next" value="https://www.frontiera.cl/?enviado=1#contacto" />
               <input type="text" name="_honey" className="hp" tabIndex={-1} autoComplete="off" aria-hidden="true" />
@@ -102,7 +102,7 @@ export function HomeIA() {
                 <label><span>Rubro</span><input name="rubro" /></label>
               </div>
               <label><span>¿Qué quiere lograr?</span><textarea name="message" rows={4} required /></label>
-              <button className="btn" type="submit">Pedir diagnóstico <span aria-hidden="true">→</span></button>
+              <button className="btn" type="submit">Enviar <span aria-hidden="true">→</span></button>
             </form>
           </div>
         </section>
